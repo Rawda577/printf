@@ -1,53 +1,82 @@
 #include "main.h"
-#include <stdarg.h>
-#include <unistd.h>
 
 /**
- * _printf - Custom printf function
- * @format: Format string
+ * _print_char - Prints a character
+ * @args: The list of arguments
+ * @count: The current count of printed characters
  *
- * Return: Number of characters printed (excluding the null byte)
+ * Return: The updated count of printed characters
+ */
+static int _print_char(va_list args, int count)
+{
+	return (_putchar(va_arg(args, int)));
+}
+
+/**
+ * _print_string - Prints a string
+ * @args: The list of arguments
+ * @count: The current count of printed characters
+ *
+ * Return: The updated count of printed characters
+ */
+static int _print_string(va_list args, int count)
+{
+	char *str = va_arg(args, char *);
+
+	if (str == NULL)
+		str = "(null)";
+
+	while (*str)
+	{
+		count += _putchar(*str);
+		str++;
+	}
+
+	return (count);
+}
+
+/**
+ * _printf - Produces output according to a format
+ * @format: A character string containing zero or more directives
+ *
+ * Return: The number of characters printed (excluding the null byte)
  */
 int _printf(const char *format, ...)
 {
-	int count = 0;
 	va_list args;
-	char *str_arg;
+	int count = 0;
 
 	va_start(args, format);
 
+	if (format == NULL)
+		return (-1);
+
 	while (*format)
 	{
-		if (*format == '%')
-	{
-		format++;
-		if (*format == 'c')
+		if (*format != '%')
 		{
-			char c = va_arg(args, int);
-
-			write(1, &c, 1);
-			count++;
+			count += _putchar(*format);
 		}
-		else if (*format == 's')
-		{
-			str_arg = va_arg(args, char *);
-			while (*str_arg)
-			{
-				write(1, str_arg, 1);
-				str_arg++;
-				count++;
-			}
-		}
-		else if (*format == '%')
-		{
-			write(1, "%", 1);
-			count++;
-		}
-	}
 		else
 		{
-			write(1, format, 1);
-			count++;
+			format++;
+			if (*format == 'c')
+			{
+				count = _print_char(args, count);
+			}
+			else if (*format == 's')
+			{
+				count = _print_string(args, count);
+			}
+			else if (*format == '%')
+			{
+				count += _putchar('%');
+			}
+			else
+			{
+				count += _putchar('%');
+				count += _putchar(*format);
+			}
 		}
 		format++;
 	}
@@ -55,3 +84,4 @@ int _printf(const char *format, ...)
 	va_end(args);
 	return (count);
 }
+
